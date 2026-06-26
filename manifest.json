@@ -4,7 +4,7 @@
     {
       "id": "mapper",
       "name": "Component Mapper",
-      "description": "标注落地页组件的 Contentful 配置层级与 entry 链接",
+      "description": "Annotate landing-page components with their Contentful config levels and entry links",
       "file": "plugins/mapper.min.js",
       "version": "1.0.0"
     }
