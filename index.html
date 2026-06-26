@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LP Mapper — Install.</title>
+  <title>LP Tools — Install</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -107,10 +107,10 @@
 </head>
 <body>
   <div class="card">
-    <h1>LP Mapper.</h1>
-    <p class="subtitle">Overlays Contentful entry links on Skyscanner landing pages,<br>showing component levels and content IDs at a glance.</p>
+    <h1>LP Tools</h1>
+    <p class="subtitle">One bookmark, many debugging tools for Skyscanner landing pages.<br>Open the panel, toggle the features you need — they load on demand.</p>
 
-    <a class="bookmarklet" id="bm">⭐ LP Mapper</a>
+    <a class="bookmarklet" id="bm">⭐ LP Tools</a>
 
     <p class="instruction">
       <strong>Drag</strong> the button above to your bookmarks bar to install.
@@ -121,14 +121,15 @@
     <p class="usage-title">How to use</p>
     <ol class="steps">
       <li data-n="1">Open any Skyscanner landing page</li>
-      <li data-n="2">Click <strong>LP Mapper</strong> in your bookmarks bar</li>
-      <li data-n="3">Components are annotated with their Contentful levels and links</li>
+      <li data-n="2">Click <strong>LP Tools</strong> in your bookmarks bar</li>
+      <li data-n="3">A panel appears — toggle any feature on or off</li>
+      <li data-n="4">Enabled features are remembered across pages and reloads</li>
     </ol>
   </div>
 
   <script>
     // Build the bookmarklet href at runtime so the URL is always current
-    var src = 'https://cdn.jsdelivr.net/gh/wu0792/lp-tools@main/mapper.min.js';
+    var src = 'https://cdn.jsdelivr.net/gh/wu0792/lp-tools@main/loader.min.js';
     document.getElementById('bm').href =
       'javascript:(function(){var s=document.createElement(\'script\');s.src=\'' +
       src + '?t=\'+Date.now();document.body.appendChild(s);})();';
