@@ -2,10 +2,31 @@
   "apiVersion": 1,
   "plugins": [
     {
+      "id": "ai-readiness",
+      "name": "AI Readiness",
+      "description": "Score how extractable and citable this page is for LLM answer engines",
+      "file": "plugins/ai-readiness.min.js",
+      "version": "1.0.0"
+    },
+    {
+      "id": "content-lint",
+      "name": "Content Lint",
+      "description": "Flag thin, empty, fallback or unmanaged landing-page content using Falcon config data",
+      "file": "plugins/content-lint.min.js",
+      "version": "1.0.0"
+    },
+    {
       "id": "mapper",
       "name": "Component Mapper",
       "description": "Annotate landing-page components with their Contentful config levels and entry links",
       "file": "plugins/mapper.min.js",
+      "version": "1.0.0"
+    },
+    {
+      "id": "schema",
+      "name": "Schema Inspector",
+      "description": "Extract and validate JSON-LD structured data and report rich-result coverage",
+      "file": "plugins/schema.min.js",
       "version": "1.0.0"
     }
   ]
