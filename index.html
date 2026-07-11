@@ -128,8 +128,9 @@
   </div>
 
   <script>
-    // Build the bookmarklet href at runtime so the URL is always current
-    var src = 'https://cdn.jsdelivr.net/gh/wu0792/lp-tools@main/loader.min.js';
+    // Build the bookmarklet href at runtime, deriving loader.min.js from THIS
+    // page's own location so it always points at the host serving these tools.
+    var src = new URL('loader.min.js', window.location.href).href;
     document.getElementById('bm').href =
       'javascript:(function(){var s=document.createElement(\'script\');s.src=\'' +
       src + '?t=\'+Date.now();document.body.appendChild(s);})();';
