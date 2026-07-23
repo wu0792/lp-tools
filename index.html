@@ -128,9 +128,14 @@
   </div>
 
   <script>
-    // Build the bookmarklet href at runtime, deriving loader.min.js from THIS
-    // page's own location so it always points at the host serving these tools.
-    var src = new URL('loader.min.js', window.location.href).href;
+    // Pin the bookmarklet to the public jsDelivr CDN, never to this page's own
+    // location. This install page can be opened from the protected internal
+    // domain (landing-pages-playground.cf-global.skyscnr.com), which sits
+    // behind Cloudflare Access — a bookmarklet pointed there would fail to
+    // load loader.js on every OTHER site (third-party request, no CF Access
+    // cookie), and would be entirely unusable to anyone without an existing
+    // login. The CDN copy is public and always loads regardless of login state.
+    var src = 'https://cdn.jsdelivr.net/gh/wu0792/lp-tools@main/loader.min.js';
     document.getElementById('bm').href =
       'javascript:(function(){var s=document.createElement(\'script\');s.src=\'' +
       src + '?t=\'+Date.now();document.body.appendChild(s);})();';
