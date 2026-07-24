@@ -136,9 +136,18 @@
     // cookie), and would be entirely unusable to anyone without an existing
     // login. The CDN copy is public and always loads regardless of login state.
     var src = 'https://cdn.jsdelivr.net/gh/wu0792/lp-tools@main/loader.min.js';
-    document.getElementById('bm').href =
+    var bm = document.getElementById('bm');
+    bm.href =
       'javascript:(function(){var s=document.createElement(\'script\');s.src=\'' +
       src + '?t=\'+Date.now();document.body.appendChild(s);})();';
+
+    // Clicking (rather than dragging) runs the javascript: URL on THIS install
+    // page instead of a landing page, injecting the panel here with nothing
+    // useful to show. Block that and steer the user back to drag-to-bookmark.
+    bm.addEventListener('click', function (e) {
+      e.preventDefault();
+      alert('请把这个按钮拖拽到浏览器的收藏栏，而不是点击它。\n\n点击只会在本页面运行，不会在目标网页上生效。');
+    });
   </script>
 </body>
 </html>
