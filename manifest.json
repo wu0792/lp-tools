@@ -9,6 +9,13 @@
       "version": "1.0.0"
     },
     {
+      "id": "experiments",
+      "name": "Experiments",
+      "description": "Show MrHyde experiment keys and config flags active on this landing page",
+      "file": "plugins/experiments.min.js",
+      "version": "1.2.0"
+    },
+    {
       "id": "mapper",
       "name": "Component Mapper",
       "description": "Annotate landing-page components with their Contentful config levels and entry links",
