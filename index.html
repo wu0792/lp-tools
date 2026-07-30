@@ -128,17 +128,78 @@
   </div>
 
   <script>
-    // Pin the bookmarklet to the public jsDelivr CDN, never to this page's own
-    // location. This install page can be opened from the protected internal
-    // domain (landing-pages-playground.cf-global.skyscnr.com), which sits
-    // behind Cloudflare Access — a bookmarklet pointed there would fail to
-    // load loader.js on every OTHER site (third-party request, no CF Access
-    // cookie), and would be entirely unusable to anyone without an existing
-    // login. The CDN copy is public and always loads regardless of login state.
-    var src = 'https://cdn.jsdelivr.net/gh/wu0792/lp-tools@main/loader.min.js';
-    document.getElementById('bm').href =
-      'javascript:(function(){var s=document.createElement(\'script\');s.src=\'' +
-      src + '?t=\'+Date.now();document.body.appendChild(s);})();';
+    // The bookmarklet is dual-mode:
+    //
+    // LANDING PAGE: loads loader.min.js from the public jsDelivr CDN (avoids
+    // Cloudflare Access issues — CDN copy is always public).
+    //
+    // KUBIT BRIDGE (skyscanner.kubit.ai): skyscanner.kubit.ai's CSP blocks
+    // external script injection, but the javascript: bookmarklet code itself
+    // is exempt from CSP. So we embed the bridge logic inline — no fetch of
+    // an external script needed. When triggered on Kubit after the LP Tools
+    // experiments panel opened the tab, it reads window.name for the pending
+    // request, fetches experiment metrics via Kubit's own GraphQL API (same-
+    // origin, session cookies included automatically), and posts the results
+    // back to the opener via postMessage.
+
+    var loaderSrc = 'https://cdn.jsdelivr.net/gh/wu0792/lp-tools@main/loader.min.js';
+
+    // Bridge code runs inline on kubit.ai — no external scripts, no CSP issues.
+    var bridge = [
+      'var n=window.name,p="lptoolsbridge:";',
+      'if(!n.startsWith(p)){alert("LP Tools: no pending request — open LP Tools on a landing page first, then click ⋯ Sync Kubit");return;}',
+      'var R;try{R=JSON.parse(n.slice(p.length));}catch(e){return;}',
+      'var exps=R.experiments||[],orig=R.origin||"*",G="https://skyscanner.kubit.ai/graphql";',
+      'var ov=document.createElement("div");',
+      'ov.style.cssText="position:fixed;top:0;left:0;right:0;z-index:9999999;padding:10px;text-align:center;font:700 13px system-ui;color:#fff;background:#0f172a";',
+      'document.body.prepend(ov);',
+      'var m=function(t,ok){ov.textContent=t;ov.style.background=ok?"#15803d":"#0f172a";};',
+      'var gql=async function(q){return(await fetch(G,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({query:q}),credentials:"include"})).json();};',
+      'var pc=function(c,id,nm){',
+        'var ls=c.trim().split("\\n").filter(Boolean);',
+        'if(ls.length<2)return{found:false,error:"empty CSV"};',
+        'var hs=ls[0].split(","),vs=ls[1].split(",");',
+        'var ri=hs.map(function(h,i){return{h:h.trim(),i};}).filter(function(x){return x.h==="Result"||x.h.endsWith(" - Result");});',
+        'return{found:true,reportId:id,reportName:nm,reportUrl:"https://skyscanner.kubit.ai/report/query/"+id,dateRange:vs[0]||"",',
+          'variants:ri.map(function(x){return{variantName:x.h==="Result"?"Overall":x.h.slice(0,-9),clicks:+vs[x.i-2]||null,renders:+vs[x.i-1]||null,ctr:+vs[x.i]||null};})};',
+      '};',
+      'var fe=async function(e){',
+        'try{',
+          'var sq="query{search(term:"+JSON.stringify(e)+",types:[ANALYSIS],schemaIds:[],categoryIds:[],editorIds:[],failedReports:false,favoriteOnly:false,queryTypes:[],pagination:{first:3,after:0},activeSchemas:true){entities{entity{...on SearchAnalysis{id name}}}}}";',
+          'var sr=await gql(sq);',
+          'var as=((sr.data&&sr.data.search&&sr.data.search.entities)||[]).map(function(x){return x.entity;}).filter(function(x){return x&&x.id;});',
+          'if(!as.length)return{found:false,error:"no reports found"};',
+          'var id=as[0].id,nm=as[0].name;',
+          'var ar=await gql("query{analysis(analysisId:\\""+id+"\\",viewMode:AUTO){id status exportUrl}}");',
+          'var eu=ar.data&&ar.data.analysis&&ar.data.analysis.exportUrl;',
+          'if(!eu)return{found:false,error:"no exportUrl"};',
+          'var csv=await(await fetch(eu)).text();',
+          'return pc(csv,id,nm);',
+        '}catch(err){return{found:false,error:err.message};}',
+      '};',
+      '(async function(){',
+        'm("LP Tools: fetching "+exps.length+" experiment(s)…");',
+        'var res={};',
+        'for(var i=0;i<exps.length;i++){',
+          'm("Fetching \\""+exps[i]+"\\" ("+(i+1)+"/"+exps.length+")…");',
+          'res[exps[i]]=await fe(exps[i]);',
+        '}',
+        'if(window.opener&&!window.opener.closed)window.opener.postMessage({type:"lptoolsbridge",results:res},orig);',
+        'm("✓ Done! Closing…",true);',
+        'setTimeout(function(){try{window.close();}catch(e){}},1800);',
+      '})();'
+    ].join('');
+
+    var bm = [
+      'javascript:(function(){',
+        'if(location.hostname==="skyscanner.kubit.ai"){', bridge, 'return;}',
+        'var s=document.createElement("script");',
+        's.src="', loaderSrc, '?t="+Date.now();',
+        'document.body.appendChild(s);',
+      '})();'
+    ].join('');
+
+    document.getElementById('bm').href = bm;
   </script>
 </body>
 </html>
