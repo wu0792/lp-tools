@@ -3,7 +3,7 @@
   "plugins": [
     {
       "id": "ai-readiness",
-      "name": "AI Readiness",
+      "name": "AI Readiness [alpha]",
       "description": "Score how extractable and citable this page is for LLM answer engines",
       "file": "plugins/ai-readiness.min.js",
       "version": "1.0.0"
